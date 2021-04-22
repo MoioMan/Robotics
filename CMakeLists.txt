@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(project1_skid)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs message_generation)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation robotics_hw1 message_filters)
 
 # Custom Message : add & generation
 add_message_files(
@@ -18,7 +18,7 @@ generate_messages(
  
 
 ## Declare a catkin package
-catkin_package( CATKIN_DEPENDS message_runtime)
+catkin_package( CATKIN_DEPENDS message_runtime robotics_hw1 message_filters)
 
 ## Build talker and listener
 include_directories(include ${catkin_INCLUDE_DIRS})
@@ -27,8 +27,15 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## add_executable([node-name] src/[mainfile].cpp)
 ## target_link_libraries([node-name] ${catkin_LIBRARIES})
 ## in case it use code generated for custom messages:
-## add_dependencies([node-name] custom_messages_generate_messages_cpp)
+## add_dependencies([node-name] project1_skid_generate_messages_cpp)
 
 add_executable(odometry_pub src/odometry_pub.cpp)
 target_link_libraries(odometry_pub ${catkin_LIBRARIES})
-add_dependencies(odometry_pub custom_messages_generate_messages_cpp)
+add_dependencies(odometry_pub project1_skid_generate_messages_cpp)
+
+add_executable(motor_synchronizer src/motor_synchronizer.cpp)
+target_link_libraries(motor_synchronizer ${catkin_LIBRARIES})
+add_dependencies(motor_synchronizer robotics_hw1_generate_messages_cpp)
+
+add_executable(baseline_calibrator src/baseline_calibrator.cpp)
+target_link_libraries(baseline_calibrator ${catkin_LIBRARIES})

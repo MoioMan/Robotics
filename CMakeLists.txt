@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(project1_skid)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation robotics_hw1 message_filters)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation robotics_hw1 message_filters tf)
 
 # Custom Message : add & generation
 add_message_files(

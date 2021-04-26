@@ -113,7 +113,7 @@ public:
         //publish custom odom
         project1_skid::SkidOdometry skidOdom;
         skidOdom.odom=odom;
-        skidOdom.method = integrationMethod;
+        skidOdom.method.data = integrationMethod;
         odomPub.publish(skidOdom);
     }
 

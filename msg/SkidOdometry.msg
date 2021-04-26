@@ -1,2 +1,2 @@
 nav_msgs/Odometry    odom
-string      method
+std_msgs/String      method

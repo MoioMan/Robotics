@@ -29,9 +29,11 @@ void onMotorMessagesSync(const MotorSpeedConstPtr& msg_fl,
                              const MotorSpeedConstPtr& msg_br) 
 {
     double w_fl, w_fr, w_bl, w_br;
-    w_fl = RPM_TO_RADS(msg_fl->rpm * GEAR_RATIO);
+
+    // Change sign for left omega
+    w_fl = -RPM_TO_RADS(msg_fl->rpm * GEAR_RATIO);
     w_fr = RPM_TO_RADS(msg_fr->rpm * GEAR_RATIO);
-    w_bl = RPM_TO_RADS(msg_bl->rpm * GEAR_RATIO);
+    w_bl = -RPM_TO_RADS(msg_bl->rpm * GEAR_RATIO);
     w_br = RPM_TO_RADS(msg_br->rpm * GEAR_RATIO);
     
     // Odometry assumption => wheel on the same size should have same angular velocity
@@ -51,7 +53,10 @@ Twist estimateTwist(double omega_left, double omega_right)
     double v_right = omega_right * WHEEL_RADIUS; 
 
     twist.linear.y = 0;
+    twist.linear.x = (v_right + v_left) / 2;
     twist.angular.z = (v_right - v_left) / APPARENT_BASELINE;
+
+    return twist;
 }
 
 void publishTwist(Twist twist, ros::Time stamp)
@@ -62,7 +67,7 @@ void publishTwist(Twist twist, ros::Time stamp)
     TwistStamped msg;
     msg.twist = twist;
 
-    msg.header.frame_id = "TODO";
+    msg.header.frame_id = "base_link";
     msg.header.seq = id;
     msg.header.stamp = stamp;
 

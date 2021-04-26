@@ -52,13 +52,13 @@ public:
         ROS_INFO("Setting (x,y) to: (%f,%f)", x, y);
     }
 
-    void computeOdom(const TwistStamped::ConstPtr& msg) {
+    void computeOdom(const TwistStamped::ConstPtr& twist) {
         double samplingTime;
-        samplingTime = lastStamp == 0 ? 0.0 : msg->header.stamp.toSec() - lastStamp;
-        lastStamp = msg->header.stamp.toSec();
+        samplingTime = lastStamp == 0 ? 0.0 : twist->header.stamp.toSec() - lastStamp;
+        lastStamp = twist->header.stamp.toSec();
 
-        if (integrationMethod == "Euler") eulerIntegration(msg, samplingTime);
-        else if (integrationMethod == "Runge-Kutta") rungeKuttaIntegration(msg, samplingTime);
+        if (integrationMethod == "euler") eulerIntegration(twist, samplingTime);
+        else if (integrationMethod == "rk") rungeKuttaIntegration(twist, samplingTime);
 
         geometry_msgs::Quaternion qMsg;
         tf2::Quaternion q;
@@ -67,23 +67,23 @@ public:
         qMsg = tf2::toMsg(q);
 
         sendTransform(q);
-        publishOdom(msg, qMsg);
+        publishOdom(twist, qMsg);
     }
 
-    void eulerIntegration(const TwistStamped::ConstPtr& msg, double samplingTime) {
-        double linearVelocity = msg->twist.linear.x;
-        double angularVelocity = msg->twist.angular.z;
-        x+=linearVelocity*samplingTime*cos(theta);
-        y+=linearVelocity*samplingTime*sin(theta);
-        theta+=angularVelocity*samplingTime;
+    void eulerIntegration(const TwistStamped::ConstPtr& twist, double samplingTime) {
+        double linearVelocity = twist->twist.linear.x;
+        double angularVelocity = twist->twist.angular.z;
+        x += linearVelocity * samplingTime * cos(theta);
+        y += linearVelocity * samplingTime * sin(theta);
+        theta += angularVelocity * samplingTime;
     }
 
-    void rungeKuttaIntegration(const TwistStamped::ConstPtr& msg, double samplingTime) {
-        double linearVelocity = msg->twist.linear.x;
-        double angularVelocity = msg->twist.angular.z;
-        x+=linearVelocity*samplingTime*cos(theta+(angularVelocity*samplingTime)/2);
-        y+=linearVelocity*samplingTime*sin(theta+(angularVelocity*samplingTime)/2);
-        theta+=angularVelocity*samplingTime;
+    void rungeKuttaIntegration(const TwistStamped::ConstPtr& twist, double samplingTime) {
+        double linearVelocity = twist->twist.linear.x;
+        double angularVelocity = twist->twist.angular.z;
+        x += linearVelocity * samplingTime * cos(theta + (angularVelocity * samplingTime) / 2);
+        y += linearVelocity * samplingTime * sin(theta + (angularVelocity * samplingTime) / 2);
+        theta += angularVelocity * samplingTime;
     }
 
     void sendTransform(tf2::Quaternion q) {
@@ -102,31 +102,31 @@ public:
         br.sendTransform(transformStamped);
     }
 
-    void publishOdom(const TwistStamped::ConstPtr& msg, geometry_msgs::Quaternion q) {
-        double linearVelocity = msg->twist.linear.x;
-        double angularVelocity = msg->twist.angular.z;
+    void publishOdom(const TwistStamped::ConstPtr& twist, geometry_msgs::Quaternion q) {
+        double linearVelocity = twist->twist.linear.x;
+        double angularVelocity = twist->twist.angular.z;
         
         nav_msgs::Odometry odom;
-        odom.header.stamp=ros::Time::now();
-        odom.header.frame_id="odom";
+        odom.header.stamp = ros::Time::now();
+        odom.header.frame_id = "odom";
 
-        odom.pose.pose.position.x=x;
-        odom.pose.pose.position.y=y;
-        odom.pose.pose.position.z=0.0;
-        odom.pose.pose.orientation=q;
+        odom.pose.pose.position.x = x;
+        odom.pose.pose.position.y = y;
+        odom.pose.pose.position.z = 0.0;
+        odom.pose.pose.orientation = q;
 
-        odom.child_frame_id="robot";
-        odom.twist.twist.linear.x=linearVelocity;
-        odom.twist.twist.linear.y=0.0;
-        odom.twist.twist.linear.z=0.0;
+        odom.child_frame_id = "robot";
+        odom.twist.twist.linear.x = linearVelocity;
+        odom.twist.twist.linear.y = 0.0;
+        odom.twist.twist.linear.z = 0.0;
 
-        odom.twist.twist.angular.x=0.0;
-        odom.twist.twist.angular.y=0.0;
-        odom.twist.twist.angular.z=angularVelocity;
+        odom.twist.twist.angular.x = 0.0;
+        odom.twist.twist.angular.y = 0.0;
+        odom.twist.twist.angular.z = angularVelocity;
 
         //publish custom odom
         project1_skid::SkidOdometry skidOdom;
-        skidOdom.odom=odom;
+        skidOdom.odom = odom;
         skidOdom.method.data = integrationMethod;
         odomPub.publish(skidOdom);
     }

@@ -6,6 +6,8 @@
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2_ros/transform_broadcaster.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
+#include <dynamic_reconfigure/server.h>
+#include <project1_skid/ParametersConfig.h>
 
 
 using namespace ros;
@@ -14,9 +16,6 @@ using namespace nav_msgs;
 using namespace tf2_ros;
 
 class pub_sub {
-
-public:
-    TwistStamped message1;
 
 private:
     NodeHandle n;
@@ -30,12 +29,27 @@ private:
     Publisher odomPub; 
     TransformBroadcaster br;
     TransformStamped transformStamped;
-    std::string integrationMethod = "Euler";
+    std::string integrationMethod = "euler";
 
 public:
     pub_sub() {
         twistSub = n.subscribe("/skid_twist", 1, &pub_sub::computeOdom, this);
         odomPub = n.advertise<project1_skid::SkidOdometry>("/odometry", 1);
+    }
+
+    void dynamicReconfigure(project1_skid::ParametersConfig &config, uint32_t level) {
+        if(config.method == 0) {
+            integrationMethod = "euler";
+            ROS_INFO("Changed integration method to: Euler");
+        }
+        else {
+            integrationMethod = "rk";
+            ROS_INFO("Changed integration method to: Runge-Kutta");
+        }
+
+        x = config.x;
+        y = config.y;
+        ROS_INFO("Setting (x,y) to: (%f,%f)", x, y);
     }
 
     void computeOdom(const TwistStamped::ConstPtr& msg) {
@@ -44,7 +58,7 @@ public:
         lastStamp = msg->header.stamp.toSec();
 
         if (integrationMethod == "Euler") eulerIntegration(msg, samplingTime);
-        else if (integrationMethod == "RungeKutta") rungeKuttaIntegration(msg, samplingTime);
+        else if (integrationMethod == "Runge-Kutta") rungeKuttaIntegration(msg, samplingTime);
 
         geometry_msgs::Quaternion qMsg;
         tf2::Quaternion q;
@@ -123,7 +137,13 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "odometry_pub");
   
     pub_sub my_pub_sub;
-  
+
+    dynamic_reconfigure::Server<project1_skid::ParametersConfig> server;
+    dynamic_reconfigure::Server<project1_skid::ParametersConfig>::CallbackType f;
+
+    f = boost::bind(&pub_sub::dynamicReconfigure, &my_pub_sub, _1, _2);
+    server.setCallback(f);
+
     ros::spin();
   
     return 0;

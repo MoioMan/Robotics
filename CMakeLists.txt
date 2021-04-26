@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.8.3)
 project(project1_skid)
 
 ## Find catkin and any catkin packages
-find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation robotics_hw1 message_filters tf)
+find_package(catkin REQUIRED COMPONENTS roscpp std_msgs nav_msgs geometry_msgs message_generation robotics_hw1 message_filters tf dynamic_reconfigure)
 
 # Custom Message : add & generation
 add_message_files(
@@ -15,6 +15,10 @@ generate_messages(
     nav_msgs
     std_msgs
  )
+
+generate_dynamic_reconfigure_options( 
+   cfg/Parameters.cfg
+)
  
 
 ## Declare a catkin package
@@ -31,6 +35,7 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 
 add_executable(odometry_pub src/odometry_pub.cpp)
 target_link_libraries(odometry_pub ${catkin_LIBRARIES})
+add_dependencies(odometry_pub ${PROJECT_NAME}_gencfg)
 add_dependencies(odometry_pub project1_skid_generate_messages_cpp)
 
 add_executable(motor_synchronizer src/motor_synchronizer.cpp)

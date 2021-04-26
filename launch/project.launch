@@ -1,0 +1,12 @@
+<launch>
+
+ <!--Set constant parameters -->
+ <param name="wheelRadius" value="0.1575" />
+ <param name="realBaseline" value="0.583" />
+ <param name="apparentBaseline" value="1.14985" />
+ <param name="gearRatio" value="0.02568" />
+ 
+ <node pkg="project1_skid" name="motor_synchronizer" type="motor_synchronizer"/>
+ <node pkg="project1_skid" name="odometry_pub" type="odometry_pub" output="screen" />
+
+</launch>

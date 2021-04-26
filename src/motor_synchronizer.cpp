@@ -76,42 +76,37 @@ void publishTwist(Twist twist, ros::Time stamp)
 
 int main(int argc, char** argv) 
 {
-    ros::init(argc, argv, "odometry_pub");
+    ros::init(argc, argv, "motor_synchronizer");
     ros::NodeHandle n;
 
     // read constant parameters
-    std::string wheelRadius;  
-    std::string app_Baseline;  
-    std::string gearRatio;
-    bool ret = n.getParam("/wheel_radius", wheelRadius);
+    bool ret = n.getParam("/apparentBaseline", APPARENT_BASELINE);    
     if (!ret)
     {
-        ROS_ERROR("Unable to get wheel_radius parameter!");
+        ROS_ERROR("Unable to get apparentBaseline parameter!");
         return -1;        
     }
-    ret = n.getParam("/real_baseline", app_Baseline);    
+    ret = n.getParam("/gearRatio", GEAR_RATIO);    
     if (!ret)
     {
-        ROS_ERROR("Unable to get app_baseline parameter!");
+        ROS_ERROR("Unable to get gearRatio parameter!");
         return -1;        
     }
-    ret = n.getParam("/gear_ratio", gearRatio);    
+    ret = n.getParam("/wheelRadius", WHEEL_RADIUS);
     if (!ret)
     {
-        ROS_ERROR("Unable to get gear_ratio parameter!");
+        ROS_ERROR("Unable to get wheelRadius parameter!");
         return -1;        
     }
 
-    WHEEL_RADIUS = std::stod(wheelRadius);
-    APPARENT_BASELINE = std::stod(app_Baseline);
-    GEAR_RATIO = std::stod(gearRatio);
+    ROS_INFO("APP_BASELINE=%f; WHEEL_RADIUS=%f; GEAR_RATIO=%f", APPARENT_BASELINE, WHEEL_RADIUS, GEAR_RATIO);
 
 	twistPublish = n.advertise<TwistStamped>("skid_twist", 500);	// Msg + (buffer)
 
     message_filters::Subscriber<MotorSpeed> sub_fl(n, "/motor_speed_fl", 1); // front left topic
     message_filters::Subscriber<MotorSpeed> sub_fr(n, "/motor_speed_fr", 1); // front right topic
-    message_filters::Subscriber<MotorSpeed> sub_bl(n, "/motor_speed_bl", 1); // front right topic
-    message_filters::Subscriber<MotorSpeed> sub_br(n, "/motor_speed_br", 1); // front right topic
+    message_filters::Subscriber<MotorSpeed> sub_bl(n, "/motor_speed_rl", 1); // front right topic
+    message_filters::Subscriber<MotorSpeed> sub_br(n, "/motor_speed_rr", 1); // front right topic
         
     // Synchronizer using approximate policy, and an instance of it
     message_filters::Synchronizer<MotorSyncPolicy> sync(MotorSyncPolicy(25), sub_fl, sub_fr, sub_bl, sub_br);

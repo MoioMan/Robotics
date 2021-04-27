@@ -8,6 +8,8 @@
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <dynamic_reconfigure/server.h>
 #include <project1_skid/ParametersConfig.h>
+#include "project1_skid/resetToPose.h"
+#include "project1_skid/resetToZero.h"
 
 
 using namespace ros;
@@ -15,14 +17,14 @@ using namespace geometry_msgs;
 using namespace nav_msgs;
 using namespace tf2_ros;
 
-class pub_sub {
+class PubSub {
 
 private:
     NodeHandle n;
 
-    double x = 0.0;
-    double y = 0.0;
-    double theta = 0.0;
+    double x;
+    double y;
+    double theta;
     double lastStamp = 0.0;
 
     Subscriber twistSub;
@@ -32,10 +34,34 @@ private:
     std::string integrationMethod = "euler";
 
 public:
-    pub_sub() {
-        twistSub = n.subscribe("/skid_twist", 1, &pub_sub::computeOdom, this);
+    PubSub() {
+        x = 0;
+        y = 0;
+        theta = 0;
+        twistSub = n.subscribe("/skid_twist", 1, &PubSub::computeOdom, this);
         odomPub = n.advertise<project1_skid::SkidOdometry>("/odometry", 1);
     }
+
+    bool reset_to_zero( project1_skid::resetToZero::Request &req, project1_skid::resetToZero::Response &res)
+    {
+        ROS_INFO("%f, %f, %f", req.x, req.y, req.theta);
+        x = req.x;
+        y = req.y;
+        theta = req.theta;
+        res.result = 200;
+        return true;
+    }
+
+    bool reset_to_pose( project1_skid::resetToPose::Request &req, project1_skid::resetToPose::Response &res)
+    {
+        ROS_INFO("%f, %f, %f", req.x, req.y, req.theta);
+        x = req.x;
+        y = req.y;
+        theta = req.theta;
+        res.result = 200;
+        return true;
+    }
+    
 
     void dynamicReconfigure(project1_skid::ParametersConfig &config, uint32_t level) {
         if(config.method == 0) {
@@ -131,19 +157,31 @@ public:
         odomPub.publish(skidOdom);
     }
 
+    NodeHandle getNode(){
+        return n;
+    }
+
 };
+
+
 
 int main(int argc, char **argv) {
     ros::init(argc, argv, "odometry_pub");
   
-    pub_sub my_pub_sub;
+    PubSub my_pub_sub;
 
     dynamic_reconfigure::Server<project1_skid::ParametersConfig> server;
     dynamic_reconfigure::Server<project1_skid::ParametersConfig>::CallbackType f;
+    
 
-    f = boost::bind(&pub_sub::dynamicReconfigure, &my_pub_sub, _1, _2);
+    f = boost::bind(&PubSub::dynamicReconfigure, &my_pub_sub, _1, _2);
     server.setCallback(f);
 
+    NodeHandle n = my_pub_sub.getNode();
+
+    ServiceServer service_pose = n.advertiseService("resetToPose",&PubSub::reset_to_pose,&my_pub_sub);
+    ServiceServer service_zero = n.advertiseService("resetToZero",&PubSub::reset_to_zero,&my_pub_sub);
+    
     ros::spin();
   
     return 0;

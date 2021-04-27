@@ -9,7 +9,13 @@ add_message_files(
  FILES
  SkidOdometry.msg
  )
- 
+
+add_service_files(
+ FILES
+ resetToZero.srv
+ resetToPose.srv
+ )
+
 generate_messages(
    DEPENDENCIES
     nav_msgs
@@ -44,3 +50,9 @@ add_dependencies(motor_synchronizer robotics_hw1_generate_messages_cpp)
 
 add_executable(baseline_calibrator src/baseline_calibrator.cpp)
 target_link_libraries(baseline_calibrator ${catkin_LIBRARIES})
+
+add_executable(reset_odom_to_pose src/reset_odom_to_pose.cpp)
+target_link_libraries(reset_odom_to_pose ${catkin_LIBRARIES})
+
+add_executable(reset_odom_to_zero src/reset_odom_to_zero.cpp)
+target_link_libraries(reset_odom_to_zero ${catkin_LIBRARIES})

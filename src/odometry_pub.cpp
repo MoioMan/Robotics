@@ -158,10 +158,9 @@ public:
             odomPub.publish(odom);
     }
 
-    NodeHandle getNode(){
+    NodeHandle getNode() {
         return n;
     }
-
 };
 
 
@@ -170,19 +169,16 @@ int main(int argc, char **argv) {
     ros::init(argc, argv, "odometry_pub");
   
     PubSub pubSub;
+    
+    NodeHandle n = pubSub.getNode();
+    ServiceServer servicePose = n.advertiseService("resetToPose", &PubSub::resetToPose, &pubSub);
+    ServiceServer serviceZero = n.advertiseService("resetToZero", &PubSub::resetToZero, &pubSub);
 
     dynamic_reconfigure::Server<project1_skid::ParametersConfig> server;
     dynamic_reconfigure::Server<project1_skid::ParametersConfig>::CallbackType f;
-    
-
     f = boost::bind(&PubSub::dynamicReconfigure, &pubSub, _1, _2);
     server.setCallback(f);
 
-    NodeHandle n = pubSub.getNode();
-
-    ServiceServer servicePose = n.advertiseService("resetToPose", &PubSub::resetToPose, &pubSub);
-    ServiceServer serviceZero = n.advertiseService("resetToZero", &PubSub::resetToZero, &pubSub);
-    
     ros::spin();
   
     return 0;

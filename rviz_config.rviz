@@ -10,6 +10,9 @@ Panels:
         - /Pose1
         - /Odometry2
         - /Odometry2/Shape1
+        - /Axes1
+        - /Axes2
+        - /Axes3
       Splitter Ratio: 0.5
     Tree Height: 549
   - Class: rviz/Selection
@@ -24,7 +27,6 @@ Panels:
   - Class: rviz/Views
     Expanded:
       - /Current View1
-      - /Current View1/Focal Point1
     Name: Views
     Splitter Ratio: 0.5
   - Class: rviz/Time
@@ -140,6 +142,27 @@ Visualization Manager:
       Topic: /odometry
       Unreliable: false
       Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 1
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: world
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 0.5
+      Name: Axes
+      Radius: 0.10000000149011612
+      Reference Frame: odom
+      Value: true
+    - Class: rviz/Axes
+      Enabled: true
+      Length: 0.20000000298023224
+      Name: Axes
+      Radius: 0.05000000074505806
+      Reference Frame: base_link
+      Value: true
   Enabled: true
   Global Options:
     Background Color: 48; 48; 48
@@ -168,25 +191,25 @@ Visualization Manager:
   Views:
     Current:
       Class: rviz/Orbit
-      Distance: 23.75438690185547
+      Distance: 21.216276168823242
       Enable Stereo Rendering:
         Stereo Eye Separation: 0.05999999865889549
         Stereo Focal Distance: 1
         Swap Stereo Eyes: false
         Value: false
       Focal Point:
-        X: 0
-        Y: 0
-        Z: 0
+        X: -1.8064517974853516
+        Y: -4.397069931030273
+        Z: 1.428816795349121
       Focal Shape Fixed Size: true
       Focal Shape Size: 0.05000000074505806
       Invert Z Axis: false
       Name: Current View
       Near Clip Distance: 0.009999999776482582
-      Pitch: 1.129795789718628
+      Pitch: 0.6903978586196899
       Target Frame: <Fixed Frame>
       Value: Orbit (rviz)
-      Yaw: 3.1553821563720703
+      Yaw: 2.3203952312469482
     Saved:
       - Class: rviz/Orbit
         Distance: 21.108226776123047

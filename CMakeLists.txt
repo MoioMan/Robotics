@@ -43,6 +43,7 @@ add_executable(odometry_pub src/odometry_pub.cpp)
 target_link_libraries(odometry_pub ${catkin_LIBRARIES})
 add_dependencies(odometry_pub ${PROJECT_NAME}_gencfg)
 add_dependencies(odometry_pub project1_skid_generate_messages_cpp)
+add_dependencies(odometry_pub ${catkin_EXPORTED_TARGETS})
 
 add_executable(motor_synchronizer src/motor_synchronizer.cpp)
 target_link_libraries(motor_synchronizer ${catkin_LIBRARIES})
@@ -53,6 +54,9 @@ target_link_libraries(baseline_calibrator ${catkin_LIBRARIES})
 
 add_executable(reset_odom_to_pose src/reset_odom_to_pose.cpp)
 target_link_libraries(reset_odom_to_pose ${catkin_LIBRARIES})
+add_dependencies(reset_odom_to_pose ${catkin_EXPORTED_TARGETS})
 
 add_executable(reset_odom_to_zero src/reset_odom_to_zero.cpp)
 target_link_libraries(reset_odom_to_zero ${catkin_LIBRARIES})
+add_dependencies(reset_odom_to_zero ${catkin_EXPORTED_TARGETS})
+

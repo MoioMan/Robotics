@@ -13,14 +13,14 @@ int main(int argc, char **argv)
     
 
     if(client_reset_to_zero.call(srv_rst_zero))
-        {
-            ROS_INFO("OK");
-        }
-        else
-        {
-            ROS_ERROR("NON VA BENE");
-            return 1;
-        }
+    {
+        ROS_INFO("OK %i",(int)srv_rst_zero.response.result);
+    }
+    else
+    {
+        ROS_ERROR("NON VA BENE");
+        return 1;
+    }
 
     return 0;
 }

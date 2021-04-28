@@ -1,12 +1,21 @@
 <launch>
 
  <!--Set constant parameters -->
+ <param name="use_sim_time" value="true" /> <!--Necessary to run with rviz-->
+
  <param name="wheelRadius" value="0.1575" />
  <param name="realBaseline" value="0.583" />
  <param name="apparentBaseline" value="1.14985" />
  <param name="gearRatio" value="0.02568" />
+ <param name="useCustomMessage" value="false" />
+
+ <node pkg="project1_skid" name="motor_synchronizer" type="motor_synchronizer" required="true" />
+ <node pkg="project1_skid" name="odometry_pub" type="odometry_pub" output="screen" required="true" />
  
- <node pkg="project1_skid" name="motor_synchronizer" type="motor_synchronizer"/>
- <node pkg="project1_skid" name="odometry_pub" type="odometry_pub" output="screen" />
+ <node pkg="tf" type="static_transform_publisher" name="world_to_odom" args="-0.832142114639 0.426361680031 0.324720174074 0.0221652016044 -0.0104456143454 -0.533567428589 0.845402538776 world odom 100" />
+
+ <!--Da rimuovere, non la vogliono nel launch-->
+ <node pkg="rosbag" type="play" name="bag1" args="--clock $(find project1_skid)/bags/bag1.bag" />
+ <node pkg="rviz" type="rviz" name="rviz" args="-d $(find project1_skid)/rviz_config.rviz" /> 
 
 </launch>

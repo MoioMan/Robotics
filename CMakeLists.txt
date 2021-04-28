@@ -39,6 +39,14 @@ include_directories(include ${catkin_INCLUDE_DIRS})
 ## in case it use code generated for custom messages:
 ## add_dependencies([node-name] project1_skid_generate_messages_cpp)
 
+add_executable(reset_odom_to_pose src/reset_odom_to_pose.cpp)
+target_link_libraries(reset_odom_to_pose ${catkin_LIBRARIES})
+add_dependencies(reset_odom_to_pose ${catkin_EXPORTED_TARGETS})
+
+add_executable(reset_odom_to_zero src/reset_odom_to_zero.cpp)
+target_link_libraries(reset_odom_to_zero ${catkin_LIBRARIES})
+add_dependencies(reset_odom_to_zero ${catkin_EXPORTED_TARGETS})
+
 add_executable(odometry_pub src/odometry_pub.cpp)
 target_link_libraries(odometry_pub ${catkin_LIBRARIES})
 add_dependencies(odometry_pub ${PROJECT_NAME}_gencfg)
@@ -52,11 +60,5 @@ add_dependencies(motor_synchronizer robotics_hw1_generate_messages_cpp)
 add_executable(baseline_calibrator src/baseline_calibrator.cpp)
 target_link_libraries(baseline_calibrator ${catkin_LIBRARIES})
 
-add_executable(reset_odom_to_pose src/reset_odom_to_pose.cpp)
-target_link_libraries(reset_odom_to_pose ${catkin_LIBRARIES})
-add_dependencies(reset_odom_to_pose ${catkin_EXPORTED_TARGETS})
 
-add_executable(reset_odom_to_zero src/reset_odom_to_zero.cpp)
-target_link_libraries(reset_odom_to_zero ${catkin_LIBRARIES})
-add_dependencies(reset_odom_to_zero ${catkin_EXPORTED_TARGETS})
 

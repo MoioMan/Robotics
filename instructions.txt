@@ -1,0 +1,39 @@
+Moioli Cristian     - 10560811
+Abanoub Faltaous    -
+Andrea Huang        -
+
+** File description **
+src/baseline_calibrator.cpp:    Node which is has been run separately only to estimate the apparent baseline and the gear ratio
+src/motor_synchronizer.cpp:     Node which synchronize the motor speed messages. Then, estimate linear and angular velocity and publishes a Twist.
+src/reset_odom_to_zero.cpp:     Node client which send a request in order to reset the odometry to (0,0,0). It sends the request and then terminate
+src/reset_odom_to_pose.cpp:     Node client which send a request in order to reset the odometry to (x,y,theta). It keep spinning and sends request when asked by the user 
+src/odometry_pub.cpp:           Node which integrate the Twist message from motor_synchronizer using the selected integration method, 
+                                then publish the computed odometry. Moreover, It listen to request for resetting the estimated odometry.
+
+msg/SkidOdometry.msg            Custom message published by odometry_pub. Contains the odometry object and the selected integration method.
+        -- Structure            nav_msgs/Odometry    odom
+                                std_msgs/String      method
+
+srv/resetToPose.srv             Service definition to reset the odometry to (x, y, theta). Request = 3 params (x, y, theta), Reply = 1 param (result)
+srv/resetToZero.srv             Service definition to reset the odometry to (x, y, theta). Request = 3 params (x, y, theta), Reply = 1 param (result)
+
+launch/project.launch           Launch file for ros.
+
+CMakeList.txt / package.xml     Usual files to instruct catkin
+
+** ROS Parameters ** 
+"use_sim_time"                  Used only to run rvix under simulation timing
+"wheelRadius"                   Constant value for the wheel radius
+"realBaseline"                  Constant value for the real baseline
+"apparentBaseline"              Constant value for the apparent baseline which has been previously estimate by baseline_calibrator node
+"gearRatio"                     Constant value for the apparent baseline which has been previously estimate by baseline_calibrator node
+"useCustomMessage"              True/false used by odometry_pub to decide whether to publish the custom message or the usual Odometry msg
+"x", "y", "theta"               Initial pose values. They are needed by the odometry_pub as starting point for the integration 
+
+** TF Tree **
+
+
+** START Procedure ** 
+
+
+** Other INFO ** 

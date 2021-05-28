@@ -1,0 +1,67 @@
+Moioli Cristian     - 10560811
+Abanoub Faltaous    - 10538148
+Andrea Huang        - 10582949
+
+** File description **
+src/baseline_calibrator.cpp:    Node which is has been run separately only to estimate the apparent baseline and the gear ratio
+src/motor_synchronizer.cpp:     Node which synchronizes the motor speed messages. Then, it estimates linear and angular velocity and publishes a Twist.
+src/reset_odom_to_zero.cpp:     Node client which send a request in order to reset the odometry to (0,0,0). It sends the request and then terminates.
+src/reset_odom_to_pose.cpp:     Node client which send a request in order to reset the odometry to (x,y,theta). It keeps spinning and sends request when asked by the user 
+src/odometry_pub.cpp:           Node which integrates the Twist message from motor_synchronizer using the selected integration method, 
+                                then publish the computed odometry. Moreover, it listens to requests for resetting the estimated odometry.
+
+msg/SkidOdometry.msg            Custom message published by odometry_pub. It contains the odometry object and the selected integration method.
+        -- Structure            nav_msgs/Odometry    odom
+                                std_msgs/String      method
+
+srv/resetToPose.srv             Service definition to reset the odometry to (x, y, theta). Request = 3 params (x, y, theta), Reply = 1 param (result)
+srv/resetToZero.srv             Service definition to reset the odometry to (x, y, theta). Request = no params, Reply = 1 param (result)
+
+launch/project.launch           Launch file for ros.
+rviz_config.rviz                Configuration file used with rviz tool.
+CMakeList.txt / package.xml     Usual files to instruct catkin
+
+** ROS Parameters ** 
+"use_sim_time"                  Used only to run rviz under simulation timing
+"wheelRadius"                   Constant value for the wheel radius
+"realBaseline"                  Constant value for the real baseline
+"apparentBaseline"              Constant value for the apparent baseline which has been previously estimated by baseline_calibrator node
+"gearRatio"                     Constant value for the gear ratio which has been previously estimated by baseline_calibrator node
+"useCustomMessage"              True/false used by odometry_pub to decide whether to publish the custom message or the usual Odometry msg
+"x", "y", "theta"               Initial pose values. They are needed by the odometry_pub as starting point for the integration 
+
+** TF Tree **
+    world -> odom
+        From the world frame (reference w.r.t the optitrack system) to the odometry reference (origin in the initial position of the robot in bag1)
+        This transformation is specified statically in the roslaunch
+    odom -> base_link
+        From the planar reference frame to the reference frame fixed on the robot.
+        This transformation is broadcasted by the odometry_pub node.
+
+** START Procedure ** 
+Ensure to put the folder under the ./src, such that catkin_make will be able to find and compile correctly the package "project1_skid"
+
+To launch everything we just need to run: "roslaunch project1_skid project.launch". 
+This command will start two nodes: the motor_synchronizer and the odometry_pub.
+Once a bag is started, the whole process is set up and odometry_pub will generate odometry messages.
+Ensure to decomment in the launch file the correctly initial (x, y, theta) for the bag which is used.
+(You can decomment in the launch file also the rviz node in order to automatically start the tool with out defined configuration file) 
+
+To run the client services to reset the odometry, there are two options:
+    1.a  rosrun project1_skid reset_odom_to_zero  -> It resets the odometry to (0,0,0) and stops. (we reset x, y, but also theta)
+    2.a  rosrun project1_skid reset_odom_to_pose  -> It resets the odometry to the pose specified by the user. The node keeps running for other requests.
+    In alternative, we can use rosservice and send the request:
+    1.b  rosservice call /resetToZero
+    2.b  rosservice call /resetToPose -- [x] [y] [theta]
+    
+To change the integration method, we can use dynamic_configure to adapt the odometry_pub integration method even if it is running:
+    rosrun dynamic_configure dynparam set /odometry_pub method [euler|rk]
+
+Finally, baseline_calibrator node can be run using rosrun, since it is independent from the other nodes.
+The node has been used to firstly retrieve an estimated gear ratio (0.02568), and then, using this value, we computed the apparent baseline.
+Indeed, running with: 1. rosrun project1_skid baseline_calibrator 1 : the node will take the value of the gear ratio from the rosparams
+                            to estimate the apparent baseline
+                      2. rosrun project1_skid baseline_calibrator : the node will estimate both the gear ratio and the apparent baseline
+    Using a fixed value for the gear ratio (option 1), we were able to obtain a more precise value for the apparent baseline w.r.t option 2.
+    The estimations has been made by averaging the computed values from bag1.
+

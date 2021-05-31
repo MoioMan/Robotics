@@ -7,32 +7,9 @@
   <!-- ***** Include fundamental parameters **** -->
   <include file="$(find project2_skid)/launch/base.launch"/>
 
-
-  <!--  ************** Navigation  ***************  -->
-   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find project2_skid)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find project2_skid)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />   
-    <rosparam file="$(find project2_skid)/cfg/local_costmap_params.yaml" command="load" />   
-    <rosparam file="$(find project2_skid)/cfg/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find project2_skid)/cfg/dwa_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find project2_skid)/cfg/move_base_params.yaml" command="load" /> 
-
-    <param name="base_global_planner" value="navfn/NavfnROS" />
-    <param name="planner_frequency" value="1.0" />
-    <param name="planner_patience" value="10.0" />
-
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <param name="controller_frequency" value="5.0" />
-    <param name="controller_patience" value="5.0" />
-
-    <param name="clearing_rotation_allowed" value="true"/> 
-  </node>
-
-
  <!-- Gmapping -->
  <!-- Include xml launch file for gmapping params-->
   <include file="$(find project2_skid)/launch/gmapping.launch.xml"/>
-
 
   <!--  **************** Visualisation ****************  -->
   <node name="rviz" pkg="rviz" type="rviz" args="-d $(find project2_skid)/rviz_tf.rviz"/>

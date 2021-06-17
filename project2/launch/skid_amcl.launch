@@ -1,14 +1,11 @@
 
 <launch>
-    <!-- ***** Include fundamental parameters **** -->
-
- <node pkg="tf" type="static_transform_publisher" name="odom_to_camera_odom" args="0 0 0 0 0 0 1 odom camera_odom_frame 100" />
- <node pkg="tf" type="static_transform_publisher" name="base_link_to_laser" args="0 0 0 1.5708 0 0 base_link laser 200" />
-
-<!--node pkg="tf" type="static_transform_publisher" name="base_li_to_laser" args="0 0 0  1.5708 0 0 laser scan 100" /--> 
-
+  <!-- ***** Include fundamental parameters **** -->
+  <include file="$(find project2_skid)/launch/base.launch"/>
+  <param name="/use_sim_time" value="true"/>
+  
   <!-- Name of the map to use and initial position -->
-  <arg name="map_file"       default="$(find project2_skid)/map/bag1_map.yaml"/> <!-- robopark_plan -->
+  <arg name="map_file"       default="$(find project2_skid)/map/map.yaml"/> <!-- robopark_plan -->
   <!--arg name="world_file"     default="$(find project2_skid)/maps/stage/bag1_map.world"/-->
   <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
@@ -17,63 +14,60 @@
   <arg name="odom_frame_id"   default="odom"/>
   <arg name="global_frame_id" default="map"/>
 
-  <param name="/use_sim_time" value="true"/>
-
-
- <!--  ***************** Robot simulation *****************  
-  <node pkg="stage_ros" type="stageros" name="stageros" args="$(arg world_file)">
-    <param name="base_watchdog_timeout" value="0.5"/>
-    <remap from="base_scan" to="scan"/>
-  </node>-->
-
-
-  <!--  ***************** Robot Model *****************  
-  <include file="$(find turtlebot_bringup)/launch/includes/robot.launch.xml">
-    <arg name="base" value="$(arg base)" />
-    <arg name="stacks" value="$(arg stacks)" />
-    <arg name="3d_sensor" value="$(arg 3d_sensor)" />
-  </include>
-  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
-    <param name="use_gui" value="false"/>
-  </node>-->
-
-
-  <!--  ************** Navigation  ***************  -->
-   <node pkg="move_base" type="move_base" respawn="false" name="move_base" output="screen">
-    <rosparam file="$(find project2_skid)/cfg/costmap_common_params.yaml" command="load" ns="global_costmap" />
-    <rosparam file="$(find project2_skid)/cfg/costmap_common_params.yaml" command="load" ns="local_costmap" />   
-    <rosparam file="$(find project2_skid)/cfg/local_costmap_params.yaml" command="load" />   
-    <rosparam file="$(find project2_skid)/cfg/global_costmap_params.yaml" command="load" />
-    <rosparam file="$(find project2_skid)/cfg/dwa_local_planner_params.yaml" command="load" />
-    <rosparam file="$(find project2_skid)/cfg/global_planner_params.yaml" command="load" />
-    <rosparam file="$(find project2_skid)/cfg/move_base_params.yaml" command="load" /> 
-
-    <param name="base_global_planner" value="navfn/NavfnROS" />  <!--   planner  navfn/NavfnROS alternative  carrot_planner/CarrotPlanner -->
-    <param name="planner_frequency" value="1.0" />
-    <param name="planner_patience" value="5.0" /> <!-- How long the planner will wait in seconds in an attempt to find a valid plan before space-clearing operations are performed.  -->
-
-    <param name="base_local_planner" value="dwa_local_planner/DWAPlannerROS" />
-    <param name="controller_frequency" value="5.0" />
-    <param name="controller_patience" value="5.0" /> <!-- How long the controller will wait in seconds without receiving a valid control before space-clearing operations are performed.  -->
-
-    <param name="clearing_rotation_allowed" value="true"/>  <!--We are ok to perform complete rotation-->
-  </node>
-
-
-  <!--  ****** Maps *****  --> 
+  <!--  ****** Map server *****  --> 
   <node name="map_server" pkg="map_server" type="map_server" args="$(arg map_file)"> <!--Start the map server-->
     <param name="frame_id" value="map"/>
   </node>
 
 
-  <!--  ****** amcl *****  -->
+  <!--  ****** amcl Parameters launch file*****  -->
   <include file="$(find project2_skid)/launch/amcl.launch.xml">
-    <arg name="scan_topic" value="scan"/>
-    <arg name="use_map_topic" value="true"/>
     <arg name="initial_pose_x" value="$(arg initial_pose_x)"/> <!--Initial position passed from the argument in the initial pose (amcl.launch.xml) -->
     <arg name="initial_pose_y" value="$(arg initial_pose_y)"/> <!--It's ok even if it's not corret. Still converges-->
     <arg name="initial_pose_a" value="$(arg initial_pose_a)"/>
   </include>
+
+
+  <!-- robot_localization EKF node for the map frame -->
+  <node pkg="robot_localization" type="ekf_localization_node" name="robot_localization_ekf_node_map"  clear_params="true">
+    <param name="frequency" value="10" />  
+    <param name="sensor_timeout" value="0.2" />  
+    <param name="two_d_mode" value="true" />
+    <param name="publish_tf" value="true" />
+    <param name="transform_time_offset" value="0.0"/>
+    <param name="transform_timeout" value="0.0"/>
+
+    <param name="map_frame" value="map" />
+    <param name="odom_frame" value="odom" />
+    <param name="base_link_frame" value="base_link" />
+    <param name="world_frame" value="map" />
+    <param name="odom0" value="/odom" /> 
+    
+    <!--EKF With Odom = -->
+    <rosparam param="odom0_config">[true, true, false,  <!--Position-->
+                                      false, false, true, <!--Orientation-->
+                                      true,  false,  false, <!--Linear Speed-->
+                                      false, false, true,   <!--Angular speed-->
+                                      false, false, false]</rosparam> <!--Linear Accell-->
+
+    <!--EKF With GT Pose info = -->
+    <!--TODO: bisogna linkare il world frame per farlo fungere-->
+    <!--Che differeza c'è con Robot_1/ground_pose??-->
+    <!--<param name="pose0" value="Robot_1/pose" /> 
+    <rosparam param="pose0_config">[true, true, false, 
+                                    false, false, true,
+                                    false, false, false, 
+                                    false, false, false,
+                                    false, false, false]</rosparam>-->
+
+
+    <!--For each localization source, we can say if differential (true/false) or relative(true/false)-->
+    <param name="odom0_differential" value="false"/><!--Differential = consider only the delta-->
+    <param name="odom0_relative" value="true"/><!--Relative = subtract the initial position-->
+
+    <remap from="odometry/filtered" to="odometry/filtered_map"/>
+  </node>
+
 
 
   <!--  **************** Visualisation ****************  -->

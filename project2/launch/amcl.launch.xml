@@ -38,7 +38,7 @@
     <param name="base_frame_id"             value="$(arg base_frame_id)"/> 
     <param name="global_frame_id"           value="$(arg global_frame_id)"/>
     <param name="resample_interval"         value="1"/>
-    <param name="transform_tolerance"       value="1.0"/> <!--TF published with timestamp = few ms after - still useful if a node is heavy-loaded-->
+    <param name="transform_tolerance"       value="2.0"/>  <!-- TF published with timestamp = few ms after - still useful if a node is heavy-loaded -->
     <param name="recovery_alpha_slow"       value="0.0"/>
     <param name="recovery_alpha_fast"       value="0.0"/>
     <param name="initial_pose_x"            value="$(arg initial_pose_x)"/>

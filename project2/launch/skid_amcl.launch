@@ -30,46 +30,41 @@
 
   <!-- robot_localization EKF node for the map frame -->
   <node pkg="robot_localization" type="ekf_localization_node" name="robot_localization_ekf_node_map"  clear_params="true">
-    <param name="frequency" value="10" />  
+    <param name="frequency" value="50" />  
     <param name="sensor_timeout" value="0.2" />  
     <param name="two_d_mode" value="true" />
     <param name="publish_tf" value="true" />
-    <param name="transform_time_offset" value="0.0"/>
-    <param name="transform_timeout" value="0.0"/>
 
     <param name="map_frame" value="map" />
     <param name="odom_frame" value="odom" />
     <param name="base_link_frame" value="base_link" />
-    <param name="world_frame" value="map" />
+    <param name="world_frame" value="odom" />
 
     <!--EKF With Odom = -->
-    <!--Mettendo sia odom0 che odom1 (con odom0 differential) c'è molta oscillazione-->
-
-    <!--<param name="odom0" value="/odom" /> 
+    <param name="odom0" value="/odom" /> 
     <rosparam param="odom0_config">[true, true, false,  
                                       false, false, true, 
-                                      true,  false,  false, 
+                                      true,  true,  false, 
                                       false, false, true, 
-                                      false, false, false]</rosparam> -->
+                                      false, false, false]</rosparam>
 
     <!--EKF With Camera Odom = -->
-    <!-- <param name="odom1" value="/camera/odom/sample" /> 
+    <param name="odom1" value="/camera/odom/sample" /> 
     <rosparam param="odom1_config">[true, true, false,  
                                       false, false, true, 
-                                      true,  false, false, 
+                                      true,  true, false, 
                                       false, false, true,   
-                                      false, false, false]</rosparam> -->
+                                      false, false, false]</rosparam>
 
     
     <!--EKF With Camera Accell = -->
-    <param name="imu0" value="/camera/accel/sample" /> 
+    <!-- <param name="imu0" value="/camera/accel/sample" /> 
     <rosparam param="imu0_config">[false, false, false,  
                                       false, false, true, 
                                       false,  false, false, 
                                       false, false, false,   
-                                      true, true, true]</rosparam>
+                                      true, false, false]</rosparam> -->
 
-    <param name="imu0_differential" value="true"/>
     
     <!--EKF With GT Pose info = -->
     <!--TODO: bisogna linkare il world frame per farlo fungere-->
@@ -81,13 +76,12 @@
                                     false, false, false]</rosparam> -->
 
 
+
     <!--For each localization source, we can say if differential (consider only the delta) 
     or relative(subtract the initial position)-->
-    <!--<param name="odom0_differential" value="true"/>
-    <param name="odom0_relative" value="false"/>-->
-
-    <param name="odom1_differential" value="false"/>
-    <param name="odom1_relative" value="true"/>
+    <param name="odom0_differential" value="false"/>
+    <param name="odom1_differential" value="true"/>
+    <param name="imu0_differential" value="false"/>
 
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
   </node>

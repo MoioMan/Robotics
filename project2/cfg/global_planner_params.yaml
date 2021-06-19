@@ -1,4 +1,0 @@
-NavfnROS:
-  
-  visualize_potential: true
-  use_dijkstra: true  # false = A*

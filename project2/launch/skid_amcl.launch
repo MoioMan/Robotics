@@ -30,7 +30,7 @@
 
   <!-- robot_localization EKF node for the map frame -->
   <node pkg="robot_localization" type="ekf_localization_node" name="robot_localization_ekf_node_map"  clear_params="true">
-    <param name="frequency" value="50" />  
+    <param name="frequency" value="25" />  
     <param name="sensor_timeout" value="0.2" />  
     <param name="two_d_mode" value="true" />
     <param name="publish_tf" value="true" />
@@ -69,7 +69,7 @@
     <rosparam param="imu1_config">[false, false, false,  
                                       false, false, true, 
                                       false, false, false, 
-                                      true, true, true,   
+                                      false, false, true,   
                                       false, false, false]</rosparam>
     
     <!--EKF With GT Pose info = -->

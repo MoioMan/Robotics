@@ -64,6 +64,7 @@
                                       false, false, false,   
                                       true, false, false]</rosparam>
 
+    <!--EKF With Camera Gyroscope = -->
     <param name="imu1" value="/camera/gyro/sample" /> 
     <rosparam param="imu1_config">[false, false, false,  
                                       false, false, true, 

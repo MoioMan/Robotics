@@ -1,0 +1,71 @@
+Moioli Cristian 	10560811
+Abanoub Faltaous	10538148
+Andrea Huang		10582949
+
+***** File Description *****
+launch folder:
+	base.launch			    Common parameters shared among all the launch files (i.e. static transformations)
+	gmapping.launch.xml		Launch gmapping to build the map using the specified parameters
+    skid_gmapping.launch	Main launch file used to build the map. It includes base.launch and gmapping.launch and run Rviz node.
+	amcl.launch.xml			Launch Amcl node using the selected parameters
+	skid_amcl.launch		Main launch file for localization. It includes base.launch and amcl.launch.xml and runs Rviz node.
+					        Moreover, It fuses amcl with ekf localization node using some input sensors. 
+map folder:
+	map.pgm/map.yaml		Map image and configuration files saved by map server
+    
+package.xml/CMakeList.txt	Usual file for catkin environment, with no further modifications
+rviz_tf.rviz				Rviz configuration file used both with gmapping and amcl
+
+
+***** TF Tree *****
+In base base.launch file, we set the following static transformations:
+odom -> camera_odom_frame
+    To connect the robot odometry to the camera odometry. There’s basically not much difference in their pose
+base_link -> link laser
+	There's a rotation of about 90° between the robot frame and the laser frame. This was found using the calibration bag
+
+While running localization, we obtain this final tf tree
+map
+	odom
+		camera_odom_frame
+			camera_pose_frame
+				camera_link_frame
+					camera_accel_frame
+						camera_accel_optical_frame	
+camera_gyro_	
+	camera_gyro_optical_frame
+		base_link
+			laser
+With the unconnected component world->Robot_1/base_link (since not used)
+
+***** Bags Usage *****
+In the following, we list the bags with their usage:
+calib.bag -> calibration of the laser frame
+1.bag -> mapping 
+2.bag -> localization
+3.bag -> localization
+
+
+***** Commands to start nodes *****
+Gmapping:
+    roslaunch project2_skid skid_gmapping.launch
+Save Map:
+    rosrun map_server map_saver -f map
+Localization:
+    roslaunch project2_skid skid_amcl.launch
+
+***** Sensor Choices *****
+From the sensor of the wheels:
+/odom: the usual odometry, which can be combined with the visual odometry from the /camera/odom/sample if considering only its variation (differential set to true). It’s accurate if considered in a short time window. So if the EKF continuously corrects the pose, its drift will be compensated. 
+Used to fuse in the state the following variables (in 2D): 
+    x, y positions
+    yaw
+    x, y velocities (the y velocity here was taken into consideration because it is a valid and meaningful measurement, indicating that the robot cannot move sideways)
+    yaw velocity
+From the sensors of the camera:
+    /camera/odom/sample:    Odometry computed by the camera system using a sequential stream of images. 
+                            Since it computes an odometry, we estimate in the Kalman Filter the same parameters used for /odom.
+    /camera/accel/sample:   Values from the accelerometer. 
+                            Used only for the linear acceleration in x, because of the non-holonomic constraint of the skid steering.
+    /camera/gyro/sample:    Values from the gyroscope, they give good measurements for yaw and yaw velocity.
+                            In the configuration matrix the values of yaw and of yaw velocity are set at true

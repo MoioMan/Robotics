@@ -5,8 +5,7 @@
   <param name="/use_sim_time" value="true"/>
   
   <!-- Name of the map to use and initial position -->
-  <arg name="map_file"       default="$(find project2_skid)/map/map.yaml"/> <!-- robopark_plan -->
-  <!--arg name="world_file"     default="$(find project2_skid)/maps/stage/bag1_map.world"/-->
+  <arg name="map_file"       default="$(find project2_skid)/map/map.yaml"/> 
   <arg name="initial_pose_x" default="0.0"/>
   <arg name="initial_pose_y" default="0.0"/>
   <arg name="initial_pose_a" default="0.0"/>
@@ -71,17 +70,7 @@
                                       false, false, false, 
                                       false, false, true,   
                                       false, false, false]</rosparam>
-    
-    <!--EKF With GT Pose info = -->
-    <!--TODO: bisogna linkare il world frame per farlo fungere-->
-    <!-- <param name="pose0" value="Robot_1/pose" /> 
-    <rosparam param="pose0_config">[true, true, false, 
-                                    false, false, true,
-                                    false, false, false, 
-                                    false, false, false,
-                                    false, false, false]</rosparam> -->
-
-
+      
 
     <!--For each localization source, we can say if differential (consider only the delta) 
     or relative(subtract the initial position)-->

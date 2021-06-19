@@ -41,29 +41,53 @@
     <param name="odom_frame" value="odom" />
     <param name="base_link_frame" value="base_link" />
     <param name="world_frame" value="map" />
-    <param name="odom0" value="/odom" /> 
-    
-    <!--EKF With Odom = -->
-    <rosparam param="odom0_config">[true, true, false,  <!--Position-->
-                                      false, false, true, <!--Orientation-->
-                                      true,  false,  false, <!--Linear Speed-->
-                                      false, false, true,   <!--Angular speed-->
-                                      false, false, false]</rosparam> <!--Linear Accell-->
 
+    <!--EKF With Odom = -->
+    <!--Mettendo sia odom0 che odom1 (con odom0 differential) c'è molta oscillazione-->
+
+    <!--<param name="odom0" value="/odom" /> 
+    <rosparam param="odom0_config">[true, true, false,  
+                                      false, false, true, 
+                                      true,  false,  false, 
+                                      false, false, true, 
+                                      false, false, false]</rosparam> -->
+
+    <!--EKF With Camera Odom = -->
+    <!-- <param name="odom1" value="/camera/odom/sample" /> 
+    <rosparam param="odom1_config">[true, true, false,  
+                                      false, false, true, 
+                                      true,  false, false, 
+                                      false, false, true,   
+                                      false, false, false]</rosparam> -->
+
+    
+    <!--EKF With Camera Accell = -->
+    <param name="imu0" value="/camera/accel/sample" /> 
+    <rosparam param="imu0_config">[false, false, false,  
+                                      false, false, true, 
+                                      false,  false, false, 
+                                      false, false, false,   
+                                      true, true, true]</rosparam>
+
+    <param name="imu0_differential" value="true"/>
+    
     <!--EKF With GT Pose info = -->
     <!--TODO: bisogna linkare il world frame per farlo fungere-->
-    <!--Che differeza c'è con Robot_1/ground_pose??-->
-    <!--<param name="pose0" value="Robot_1/pose" /> 
+    <!-- <param name="pose0" value="Robot_1/pose" /> 
     <rosparam param="pose0_config">[true, true, false, 
                                     false, false, true,
                                     false, false, false, 
                                     false, false, false,
-                                    false, false, false]</rosparam>-->
+                                    false, false, false]</rosparam> -->
 
 
-    <!--For each localization source, we can say if differential (true/false) or relative(true/false)-->
-    <param name="odom0_differential" value="false"/><!--Differential = consider only the delta-->
-    <param name="odom0_relative" value="true"/><!--Relative = subtract the initial position-->
+    <!--For each localization source, we can say if differential (consider only the delta) 
+    or relative(subtract the initial position)-->
+    <!--<param name="odom0_differential" value="true"/>
+    <param name="odom0_relative" value="false"/>-->
+
+    <param name="odom1_differential" value="false"/>
+    <param name="odom1_relative" value="true"/>
 
     <remap from="odometry/filtered" to="odometry/filtered_map"/>
   </node>

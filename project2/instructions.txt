@@ -54,7 +54,8 @@ Save Map:
     rosrun map_server map_saver -f map
 Localization:
     roslaunch project2_skid skid_amcl.launch
-
+    (amcl load the map from (find project2_skid)/map/map.yaml)
+    
 ***** Sensor Choices *****
 From the sensor of the wheels:
 /odom: the usual odometry, which can be combined with the visual odometry from the /camera/odom/sample if considering only its variation (differential set to true). It’s accurate if considered in a short time window. So if the EKF continuously corrects the pose, its drift will be compensated. 

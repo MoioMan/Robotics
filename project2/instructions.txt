@@ -4,23 +4,23 @@ Andrea Huang		10582949
 
 ***** File Description *****
 launch folder:
-	base.launch			    Common parameters shared among all the launch files (i.e. static transformations)
+	base.launch			Common parameters shared among all the launch files (i.e. static transformations)
 	gmapping.launch.xml		Launch gmapping to build the map using the specified parameters
-    skid_gmapping.launch	Main launch file used to build the map. It includes base.launch and gmapping.launch and run Rviz node.
+    	skid_gmapping.launch		Main launch file used to build the map. It includes base.launch and gmapping.launch and run Rviz node.
 	amcl.launch.xml			Launch Amcl node using the selected parameters
 	skid_amcl.launch		Main launch file for localization. It includes base.launch and amcl.launch.xml and runs Rviz node.
-					        Moreover, It fuses amcl with ekf localization node using some input sensors. 
+					Moreover, It fuses amcl with ekf localization node using some input sensors. 
 map folder:
 	map.pgm/map.yaml		Map image and configuration files saved by map server
     
 package.xml/CMakeList.txt	Usual file for catkin environment, with no further modifications
-rviz_tf.rviz				Rviz configuration file used both with gmapping and amcl
+rviz_tf.rviz			Rviz configuration file used both with gmapping and amcl
 
 
 ***** TF Tree *****
 In base base.launch file, we set the following static transformations:
 odom -> camera_odom_frame
-    To connect the robot odometry to the camera odometry. There’s basically not much difference in their pose
+	To connect the robot odometry to the camera odometry. There’s basically not much difference in their pose
 base_link -> link laser
 	There's a rotation of about 90° between the robot frame and the laser frame. This was found using the calibration bag
 
@@ -39,6 +39,7 @@ camera_gyro_
 With the unconnected component world->Robot_1/base_link (since not used)
 
 ***** Bags Usage *****
+We used the original bags, without any tf remapping.
 In the following, we list the bags with their usage:
 calib.bag -> calibration of the laser frame
 1.bag -> mapping 
@@ -69,3 +70,8 @@ From the sensors of the camera:
                             Used only for the linear acceleration in x, because of the non-holonomic constraint of the skid steering.
     /camera/gyro/sample:    Values from the gyroscope, they give good measurements for yaw and yaw velocity.
                             In the configuration matrix the values of yaw and of yaw velocity are set at true
+			    
+***** Useful info *****
+We set the EKF update frequency to 25 Hz, because we checked that the maximum publishing frequency of topics of the bag was at about 50 Hz.
+We set the sensor max range parameter in the gmapping configuration to the value defined in the sensor datasheet.
+We also set the expected map size to 30x30 cells to contain the whole generated map in the gmapping configuration file.
